@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace CalculateurAge.ViewModels;
 
 // Contient l ETAT de l ecran et les ACTIONS possibles.
@@ -67,6 +69,10 @@ public class CalculateurViewModel : BaseViewModel
 		set => SetField(ref _prochainAnniversaire, value);
 	}
 
+	// Fonctionnalite 5 : historique des calculs, le plus recent en tete.
+	// ObservableCollection previent la vue a chaque ajout ou suppression.
+	public ObservableCollection<string> Historique { get; } = new();
+
 	// Liee a Button.Command dans le XAML.
 	public RelayCommand CalculerCommand { get; }
 
@@ -106,6 +112,9 @@ public class CalculateurViewModel : BaseViewModel
 		ProchainAnniversaire = jours == 0
 			? "Joyeux anniversaire !"
 			: $"Prochain anniversaire dans {jours} jour(s)";
+
+		Historique.Insert(0,
+			$"{DateTime.Now:HH:mm} - {Nom} : {age} ans ({Statut})");
 
 		ResultatVisible = true;
 	}
