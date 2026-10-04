@@ -36,6 +36,14 @@ public class CalculateurViewModel : BaseViewModel
 		set => SetField(ref _resultatVisible, value);
 	}
 
+	// Fonctionnalite 1 : "Majeur" ou "Mineur" selon l age.
+	private string _statut = "";
+	public string Statut
+	{
+		get => _statut;
+		set => SetField(ref _statut, value);
+	}
+
 	// Liee a Button.Command dans le XAML.
 	public RelayCommand CalculerCommand { get; }
 
@@ -55,6 +63,7 @@ public class CalculateurViewModel : BaseViewModel
 		    DateTime.Today.AddYears(-age)) age--;
 
 		Resultat = $"{Nom}, vous avez {age} ans";
+		Statut = age >= 18 ? "Majeur" : "Mineur";
 		ResultatVisible = true;
 	}
 }
