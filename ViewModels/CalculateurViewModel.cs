@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using CalculateurAge.Services;
+using CalculateurAge.Views;
 
 namespace CalculateurAge.ViewModels;
 
@@ -50,7 +52,11 @@ public class CalculateurViewModel : BaseViewModel
 	public bool ResultatVisible
 	{
 		get => _resultatVisible;
-		set => SetField(ref _resultatVisible, value);
+		set
+		{
+			if (SetField(ref _resultatVisible, value))
+				VoirDetailCommand.Rafraichir();
+		}
 	}
 
 	// Fonctionnalite 1 : "Majeur" ou "Mineur" selon l age.
@@ -79,12 +85,36 @@ public class CalculateurViewModel : BaseViewModel
 	// Fonctionnalite 4 : remet tous les champs a zero.
 	public RelayCommand EffacerCommand { get; }
 
-	public CalculateurViewModel()
+	// Fonctionnalite 6 : le ViewModel envoie le resultat vers ResultatPage.
+	public RelayCommand VoirDetailCommand { get; }
+
+	private readonly INavigationService _navigation;
+	// Valeurs du dernier calcul (le Nom peut changer ensuite).
+	private string _nomCalcule = "";
+	private int _age;
+
+	public CalculateurViewModel(INavigationService navigation)
 	{
+		_navigation = navigation;
 		CalculerCommand = new RelayCommand(
 			Calculer,
 			() => !string.IsNullOrWhiteSpace(Nom) && !DateInvalide);
 		EffacerCommand = new RelayCommand(Effacer);
+		VoirDetailCommand = new RelayCommand(
+			VoirDetail,
+			() => ResultatVisible);
+	}
+
+	private async void VoirDetail()
+	{
+		await _navigation.AllerVers(nameof(ResultatPage),
+			new Dictionary<string, object>
+			{
+				["nom"] = _nomCalcule,
+				["age"] = _age,
+				["statut"] = Statut,
+				["anniversaire"] = ProchainAnniversaire,
+			});
 	}
 
 	private void Effacer()
@@ -106,6 +136,8 @@ public class CalculateurViewModel : BaseViewModel
 		    DateTime.Today.AddYears(-age)) age--;
 
 		Resultat = $"{Nom}, vous avez {age} ans";
+		_nomCalcule = Nom;
+		_age = age;
 		Statut = age >= 18 ? "Majeur" : "Mineur";
 
 		int jours = JoursAvantAnniversaire(DateNaissance, age);
