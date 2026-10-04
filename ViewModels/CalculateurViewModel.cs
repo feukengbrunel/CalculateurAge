@@ -21,8 +21,23 @@ public class CalculateurViewModel : BaseViewModel
 	public DateTime DateNaissance
 	{
 		get => _dateNaissance;
-		set => SetField(ref _dateNaissance, value);
+		set
+		{
+			if (!SetField(ref _dateNaissance, value)) return;
+			// Fonctionnalite 2 : on refuse une date future.
+			OnPropertyChanged(nameof(ErreurDate));
+			OnPropertyChanged(nameof(DateInvalide));
+			CalculerCommand.Rafraichir();
+		}
 	}
+
+	// Vrai si la date choisie est dans le futur.
+	public bool DateInvalide => DateNaissance.Date > DateTime.Today;
+
+	// Message affiche sous le DatePicker quand la date est refusee.
+	public string ErreurDate => DateInvalide
+		? "La date de naissance ne peut pas etre dans le futur."
+		: "";
 
 	public string Resultat
 	{
@@ -51,7 +66,7 @@ public class CalculateurViewModel : BaseViewModel
 	{
 		CalculerCommand = new RelayCommand(
 			Calculer,
-			() => !string.IsNullOrWhiteSpace(Nom));
+			() => !string.IsNullOrWhiteSpace(Nom) && !DateInvalide);
 	}
 
 	// La logique metier : aucun controle d interface ici.

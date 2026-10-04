@@ -13,6 +13,8 @@
                    Placeholder="Votre nom"/>
             <Label Text="Date de naissance" FontSize="16"/>
             <DatePicker Date="{Binding DateNaissance}"/>
+            <Label Text="{Binding ErreurDate}" TextColor="Red"
+                   IsVisible="{Binding DateInvalide}"/>
             <Button Text="Calculer"
                     Command="{Binding CalculerCommand}"/>
             <Label Text="{Binding Resultat}" FontSize="20"
