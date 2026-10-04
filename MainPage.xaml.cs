@@ -1,3 +1,5 @@
+using CalculateurAge.Views;
+
 namespace CalculateurAge;
 
 public partial class MainPage : ContentPage
@@ -25,9 +27,8 @@ public partial class MainPage : ContentPage
 		// on retire une annee.
 		if (d.Date > DateTime.Today.AddYears(-age)) age--;
 
-		// On ecrit DIRECTEMENT dans les controles : c est
-		// precisement ce que le MVVM va supprimer.
-		lblResultat.Text = $"{entryNom.Text}, vous avez {age} ans";
-		lblResultat.IsVisible = true;
+		// Navigation vers la page de resultat avec parametres.
+		await Shell.Current.GoToAsync(
+			$"{nameof(ResultatPage)}?nom={entryNom.Text}&age={age}");
 	}
 }
