@@ -59,6 +59,14 @@ public class CalculateurViewModel : BaseViewModel
 		set => SetField(ref _statut, value);
 	}
 
+	// Fonctionnalite 3 : jours restants avant le prochain anniversaire.
+	private string _prochainAnniversaire = "";
+	public string ProchainAnniversaire
+	{
+		get => _prochainAnniversaire;
+		set => SetField(ref _prochainAnniversaire, value);
+	}
+
 	// Liee a Button.Command dans le XAML.
 	public RelayCommand CalculerCommand { get; }
 
@@ -79,6 +87,21 @@ public class CalculateurViewModel : BaseViewModel
 
 		Resultat = $"{Nom}, vous avez {age} ans";
 		Statut = age >= 18 ? "Majeur" : "Mineur";
+
+		int jours = JoursAvantAnniversaire(DateNaissance, age);
+		ProchainAnniversaire = jours == 0
+			? "Joyeux anniversaire !"
+			: $"Prochain anniversaire dans {jours} jour(s)";
+
 		ResultatVisible = true;
+	}
+
+	// AddYears gere le 29 fevrier (ramene au 28 les annees non bissextiles).
+	private static int JoursAvantAnniversaire(DateTime naissance, int age)
+	{
+		DateTime prochain = naissance.Date.AddYears(age);
+		if (prochain < DateTime.Today)
+			prochain = naissance.Date.AddYears(age + 1);
+		return (prochain - DateTime.Today).Days;
 	}
 }
